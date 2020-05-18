@@ -1,0 +1,2 @@
+mvn -Dexec.mainClass=com.mera.education.grpc.task.server.TaskServer -Dexec.classpathScope=test compile test-compile exec:java
+mvn -Dexec.mainClass=com.mera.education.grpc.task.client.TaskClient -Dexec.classpathScope=test compile test-compile exec:java
