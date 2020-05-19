@@ -6,7 +6,7 @@ option java_package = "com.mera.education.grpc.proto.task";
 option java_multiple_files = true;
 
 message Task {
-    string number = 1;
+    double number = 1;
 
 };
 
@@ -15,7 +15,7 @@ message TaskRequest {
 };
 
 message TaskResponse {
-    string result = 1;
+    double result = 1;
 };
 
 message TaskManyTimesRequest {
@@ -23,7 +23,7 @@ message TaskManyTimesRequest {
 };
 
 message TaskManyTimesResponse {
-    string result = 1;
+    double result = 1;
 };
 
 message LongTaskRequest {
@@ -31,7 +31,7 @@ message LongTaskRequest {
 };
 
 message LongTaskResponse {
-    string result = 1;
+    double result = 1;
 };
 
 message TaskEveryoneRequest {
@@ -39,7 +39,7 @@ message TaskEveryoneRequest {
 };
 
 message TaskEveryoneResponse {
-    string result = 1;
+    double result = 1;
 };
 
 service TaskService {

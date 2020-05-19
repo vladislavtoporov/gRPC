@@ -66,7 +66,7 @@ public class TaskClient {
         //Unary
         //created a protocol buffer processing message
         Task tasking = Task.newBuilder()
-                .setNumber("625")
+                .setNumber(625)
                 .build();
 
         // the same for request
@@ -86,7 +86,7 @@ public class TaskClient {
         TaskServiceGrpc.TaskServiceBlockingStub taskClient = TaskServiceGrpc.newBlockingStub(channel);
         //Server Streaming
         Task tasking = Task.newBuilder()
-                .setNumber("210")
+                .setNumber(210)
                 .build();
         TaskManyTimesRequest taskManyTimesRequest = TaskManyTimesRequest.newBuilder()
                 .setTask(tasking)
@@ -131,21 +131,21 @@ public class TaskClient {
         logger.debug("Sending number #1");
         requestObserver.onNext(LongTaskRequest.newBuilder()
                 .setTask(Task.newBuilder()
-                        .setNumber("1")
+                        .setNumber(1)
                         .build())
                 .build());
 
         logger.debug("Sending number #2");
         requestObserver.onNext(LongTaskRequest.newBuilder()
                 .setTask(Task.newBuilder()
-                        .setNumber("2")
+                        .setNumber(2)
                         .build())
                 .build());
 
         logger.debug("Sending number #3");
         requestObserver.onNext(LongTaskRequest.newBuilder()
                 .setTask(Task.newBuilder()
-                        .setNumber("3")
+                        .setNumber(3)
                         .build())
                 .build());
 
@@ -183,7 +183,7 @@ public class TaskClient {
             }
         });
 
-        Arrays.asList("1", "2", "3", "4", "5").forEach(
+        Arrays.asList(1, 2, 3, 4, 5).forEach(
                 number -> {
                     logger.debug("Sending: {}", number);
                     requestObserver.onNext(TaskEveryoneRequest.newBuilder()

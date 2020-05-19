@@ -11,7 +11,6 @@ import java.util.stream.Collector;
 import java.util.stream.Stream;
 
 public class TaskServiceImpl extends TaskServiceGrpc.TaskServiceImplBase {
-    private static String default_fallback_message = "Неверный формат числа";
     private static volatile double max_number = 0d;
     private static Logger logger = LoggerFactory.getLogger(TaskServiceImpl.class);
 
@@ -19,40 +18,26 @@ public class TaskServiceImpl extends TaskServiceGrpc.TaskServiceImplBase {
     public void task(TaskRequest request, StreamObserver<TaskResponse> responseObserver) {
         logger.debug("*** Unary implementation on server side ***");
         Task tasking = request.getTask();
-        String number = tasking.getNumber();
+        double number = tasking.getNumber();
         logger.debug("Request has been received on server side: number - {}", number);
-        Double double_number = null;
-        try {
-            double_number = Double.parseDouble(number);
-            double_number = Math.sqrt(double_number);
-            String result = String.valueOf(double_number);
-            TaskResponse response = TaskResponse.newBuilder()
-                    .setResult(result)
-                    .build();
+        number = Math.sqrt(number);
+        TaskResponse response = TaskResponse.newBuilder()
+                .setResult(number)
+                .build();
+        //send the response
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
 
-            //send the response
-            responseObserver.onNext(response);
-        } catch (NumberFormatException e) {
-            e.printStackTrace();
-            TaskResponse response = TaskResponse.newBuilder()
-                    .setResult(default_fallback_message)
-                    .build();
-            //send the response
-            responseObserver.onNext(response);
-        } finally {
-            //complete RPC call
-            responseObserver.onCompleted();
-        }
     }
 
     @Override
     public void taskManyTimes(TaskManyTimesRequest request, StreamObserver<TaskManyTimesResponse> responseObserver) {
         logger.debug("*** Server streaming implementation on server side ***");
         Task tasking = request.getTask();
-        String number = tasking.getNumber();
+        double number = tasking.getNumber();
         try {
-            int currentNumber = Integer.parseInt(number);
-            int k = 2;
+            int currentNumber = (int) number;
+            double k = 2.0;
             while (currentNumber != 1) {
                 if (currentNumber % k != 0)
                     k++;
@@ -60,7 +45,7 @@ public class TaskServiceImpl extends TaskServiceGrpc.TaskServiceImplBase {
                     currentNumber /= k;
 
                     TaskManyTimesResponse response = TaskManyTimesResponse.newBuilder()
-                            .setResult(String.valueOf(k))
+                            .setResult(k)
                             .build();
                     logger.debug("send response {}", k);
                     responseObserver.onNext(response);
@@ -68,14 +53,8 @@ public class TaskServiceImpl extends TaskServiceGrpc.TaskServiceImplBase {
 
                 }
             }
-        } catch (InterruptedException | NumberFormatException e) {
+        } catch (InterruptedException e) {
             e.printStackTrace();
-            TaskManyTimesResponse response = TaskManyTimesResponse.newBuilder()
-                    .setResult(default_fallback_message)
-                    .build();
-
-            //send the response
-            responseObserver.onNext(response);
         } finally {
             logger.debug("all messages have been sent");
             responseObserver.onCompleted();
@@ -94,16 +73,7 @@ public class TaskServiceImpl extends TaskServiceGrpc.TaskServiceImplBase {
             public void onNext(LongTaskRequest longTaskRequest) {
                 logger.debug("make some calculation for each request");
                 //client sends a message
-                try {
-                    ds.add(Double.parseDouble(longTaskRequest.getTask().getNumber()));
-                } catch (NumberFormatException e) {
-                    LongTaskResponse response = LongTaskResponse.newBuilder()
-                            .setResult(default_fallback_message)
-                            .build();
-                    //send the response
-                    responseObserver.onNext(response);
-                }
-
+                ds.add(longTaskRequest.getTask().getNumber());
             }
 
             @Override
@@ -117,7 +87,7 @@ public class TaskServiceImpl extends TaskServiceGrpc.TaskServiceImplBase {
 //                client is done, this is when we want to return a response (responseObserver)
                 double result = stream.collect(DoubleStatistics.collector()).getStandardDeviation();
                 responseObserver.onNext(LongTaskResponse.newBuilder()
-                        .setResult(String.valueOf(result))
+                        .setResult(result)
                         .build());
                 logger.debug("Send result: {}", result);
                 responseObserver.onCompleted();
@@ -136,26 +106,17 @@ public class TaskServiceImpl extends TaskServiceGrpc.TaskServiceImplBase {
             @Override
             public void onNext(TaskEveryoneRequest value) {
                 //client sends a message
-                String number = value.getTask().getNumber();
-                try {
-                    double double_number = Double.parseDouble(number);
-                    if (double_number > max_number)
-                        max_number = double_number;
-                    TaskEveryoneResponse taskEveryoneResponse = TaskEveryoneResponse.newBuilder()
-                            .setResult(String.valueOf(max_number))
-                            .build();
+                double number = value.getTask().getNumber();
+                if (number > max_number)
+                    max_number = number;
+                TaskEveryoneResponse taskEveryoneResponse = TaskEveryoneResponse.newBuilder()
+                        .setResult(max_number)
+                        .build();
 
-                    //send message for each request
-                    logger.debug("Send result for each request: {}", max_number);
-                    responseObserver.onNext(taskEveryoneResponse);
-                }
-                catch (NumberFormatException e) {
-                    TaskEveryoneResponse response = TaskEveryoneResponse.newBuilder()
-                            .setResult(default_fallback_message)
-                            .build();
-                    //send the response
-                    responseObserver.onNext(response);
-                }
+                //send message for each request
+                logger.debug("Send result for each request: {}", max_number);
+                responseObserver.onNext(taskEveryoneResponse);
+
             }
 
             @Override

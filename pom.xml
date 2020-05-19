@@ -55,7 +55,6 @@
     </dependencies>
 
     <build>
-
         <extensions>
             <extension>
                 <groupId>kr.motd.maven</groupId>
@@ -93,6 +92,11 @@
                 </configuration>
             </plugin>
         </plugins>
+<!--        <resources>-->
+<!--            <resource>-->
+<!--                <directory>src/main/proto</directory>-->
+<!--            </resource>-->
+<!--        </resources>-->
 
     </build>
 
